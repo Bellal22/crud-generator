@@ -16,7 +16,7 @@
   },
   "autoload": {
     "psr-4": {
-      "AhmedAliraqi\\CrudGenerator\\": "src/"
+      "Bellal\\CrudGenerator\\": "src/"
     }
   },
   "extra": {
