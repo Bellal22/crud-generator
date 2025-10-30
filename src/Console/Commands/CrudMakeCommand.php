@@ -25,7 +25,7 @@ class CrudMakeCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'make:crud
+    protected $signature = 'make:module-crud
                             {name : Class (Singular), e.g User, Place, Car}
                             {--translatable : Whether the model supports translations}
                             {--has-media : Whether the model has media}
