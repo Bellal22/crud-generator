@@ -1,12 +1,12 @@
 {
-  "name": "ahmed-aliraqi/crud-generator",
+  "name": "bellal22/crud-generator",
   "description": "This package is a useful tool to generate simple crud for laravel-modules/scaffolding",
   "type": "library",
   "license": "MIT",
   "authors": [
     {
-      "name": "Ahmed Fathy",
-      "email": "aliraqi.dev@gmail.com"
+      "name": "Bellal Hassen",
+      "email": "bellalhassen89@gmail.com"
     }
   ],
   "require": {
