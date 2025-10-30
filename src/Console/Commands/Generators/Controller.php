@@ -8,36 +8,53 @@ use AhmedAliraqi\CrudGenerator\Console\Commands\CrudMakeCommand;
 
 class Controller extends CrudGenerator
 {
-    public static function generate(CrudMakeCommand $command)
+    public static function generate(CrudMakeCommand $command, string $base_path)
     {
         $name = Str::of($command->argument('name'))->singular()->studly();
+        $module_name = Str::of($command->option('module'))->singular()->studly();
 
         $namespace = Str::of($name)->plural()->studly();
 
         $hasMedia = $command->option('has-media');
 
-        // ApiController
+        $apiDir = base_path($base_path . "app/Http/Controllers/Api");
+        $dashboardDir = base_path($base_path . "app/Http/Controllers/Dashboard");
+
+// ensure directories exist
+        if (!is_dir($apiDir)) {
+            mkdir($apiDir, 0755, true);
+        }
+
+        if (!is_dir($dashboardDir)) {
+            mkdir($dashboardDir, 0755, true);
+        }
+
+// ApiController
         static::put(
-            app_path("Http/Controllers/Api"),
-            $name.'Controller.php',
+            $apiDir,
+            $name . 'Controller.php',
             self::qualifyContent(
-                __DIR__.'/../stubs/Controllers/Api/Controller.stub',
-                $name
+                __DIR__ . '/../stubs/Controllers/Api/Controller.stub',
+                $name,
+                $module_name
             )
         );
 
+// choose stub
         $stub = $hasMedia
-            ? __DIR__.'/../stubs/Controllers/Dashboard/MediaController.stub'
-            : __DIR__.'/../stubs/Controllers/Dashboard/Controller.stub';
+            ? __DIR__ . '/../stubs/Controllers/Dashboard/MediaController.stub'
+            : __DIR__ . '/../stubs/Controllers/Dashboard/Controller.stub';
 
-        // DashboardController
+// DashboardController
         static::put(
-            app_path("Http/Controllers/Dashboard"),
-            $name.'Controller.php',
+            $dashboardDir,
+            $name . 'Controller.php',
             self::qualifyContent(
                 $stub,
-                $name
+                $name,
+                $module_name
             )
         );
+
     }
 }

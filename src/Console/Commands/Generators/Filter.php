@@ -8,11 +8,13 @@ use AhmedAliraqi\CrudGenerator\Console\Commands\CrudMakeCommand;
 
 class Filter extends CrudGenerator
 {
-    public static function generate(CrudMakeCommand $command)
+    public static function generate(CrudMakeCommand $command, string $base_path)
     {
         $name = Str::of($command->argument('name'))->singular()->studly();
 
         $namespace = Str::of($name)->plural()->studly();
+        $module_name = Str::of($command->option('module'))->singular()->studly();
+
 
         $translatable = $command->option('translatable');
 
@@ -20,12 +22,19 @@ class Filter extends CrudGenerator
             ? __DIR__.'/../stubs/Filters/TranslatableFilter.stub'
             : __DIR__.'/../stubs/Filters/Filter.stub';
 
+        $dir = base_path($base_path . 'app/Http/Filters');
+
+        // ensure directory exists
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
         static::put(
-            app_path("Http/Filters"),
+            base_path($base_path."app/Http/Filters"),
             $name.'Filter.php',
             self::qualifyContent(
                 $filterStub,
-                $name
+                $name,
+                $module_name
             )
         );
     }

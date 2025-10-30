@@ -8,7 +8,7 @@ use AhmedAliraqi\CrudGenerator\Console\Commands\CrudMakeCommand;
 
 class Request extends CrudGenerator
 {
-    public static function generate(CrudMakeCommand $command)
+    public static function generate(CrudMakeCommand $command, string $base_path)
     {
         $name = Str::of($command->argument('name'))->singular()->studly();
 
@@ -20,12 +20,22 @@ class Request extends CrudGenerator
             ? __DIR__.'/../stubs/Requests/TranslatableRequest.stub'
             : __DIR__.'/../stubs/Requests/Request.stub';
 
+
+        $dir = base_path($base_path . 'app/Http/Requests/Dashboard');
+
+        // ensure directory exists
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+
+
         static::put(
-            app_path("Http/Requests/Dashboard"),
+            base_path($base_path."app/Http/Requests/Dashboard"),
             $name.'Request.php',
             self::qualifyContent(
                 $stub,
-                $name
+                $name,
+                $module_name = Str::of($command->option('module'))->singular()->studly()
             )
         );
     }

@@ -8,18 +8,19 @@ use AhmedAliraqi\CrudGenerator\Console\Commands\CrudMakeCommand;
 
 class Policy extends CrudGenerator
 {
-    public static function generate(CrudMakeCommand $command)
+    public static function generate(CrudMakeCommand $command, string $base_path)
     {
         $name = Str::of($command->argument('name'))->singular()->studly();
 
         $stub = __DIR__.'/../stubs/Policy/Policy.stub';
 
         static::put(
-            app_path("Policies"),
+            base_path($base_path."app/Policies"),
             $name.'Policy.php',
             self::qualifyContent(
                 $stub,
-                $name
+                $name,
+                $module_name = Str::of($command->option('module'))->singular()->studly()
             )
         );
     }

@@ -8,7 +8,7 @@ use AhmedAliraqi\CrudGenerator\Console\Commands\CrudMakeCommand;
 
 class Test extends CrudGenerator
 {
-    public static function generate(CrudMakeCommand $command)
+    public static function generate(CrudMakeCommand $command, string $base_path)
     {
         $name = Str::of($command->argument('name'))->singular()->studly();
 
@@ -25,14 +25,16 @@ class Test extends CrudGenerator
             $name.'Test.php',
             self::qualifyContent(
                 __DIR__.'/../stubs/Tests/Api/Test.stub',
-                $name
+                $name,
+                $module_name = Str::of($command->option('module'))->singular()->studly()
             )
         );
 
         static::put(
             base_path("tests/Feature/Dashboard"),
             $name.'Test.php',
-            self::qualifyContent($path, $name)
+            self::qualifyContent($path, $name,
+                $module_name = Str::of($command->option('module'))->singular()->studly())
         );
     }
 }

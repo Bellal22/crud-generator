@@ -9,7 +9,7 @@ use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class Migration extends CrudGenerator
 {
-    public static function generate(CrudMakeCommand $command)
+    public static function generate(CrudMakeCommand $command, string $base_path)
     {
         $name = Str::of($command->argument('name'))->singular()->studly();
 
@@ -22,11 +22,12 @@ class Migration extends CrudGenerator
         $table = Str::of($name)->snake()->lower()->plural();
 
         static::put(
-            database_path("migrations"),
+            base_path($base_path."database/migrations"),
             date('Y_m_d_His')."_create_{$table}_table.php",
             self::qualifyContent(
                 $filterStub,
-                $name
+                $name,
+                $module_name = Str::of($command->option('module'))->singular()->studly()
             )
         );
     }

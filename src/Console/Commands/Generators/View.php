@@ -6,10 +6,12 @@ use Illuminate\Support\Str;
 use AhmedAliraqi\CrudGenerator\Console\Commands\CrudGenerator;
 use AhmedAliraqi\CrudGenerator\Console\Commands\CrudMakeCommand;
 use Stichoza\GoogleTranslate\GoogleTranslate;
+use Illuminate\Support\Facades\File;
+
 
 class View extends CrudGenerator
 {
-    public static function generate(CrudMakeCommand $command)
+    public static function generate(CrudMakeCommand $command, string $base_path)
     {
         $name = Str::of($command->argument('name'))->plural()->snake();
 
@@ -27,136 +29,66 @@ class View extends CrudGenerator
             $stubPath = __DIR__.'/../stubs/Views/default';
         }
 
-        // Actions
-        static::put(
-            resource_path("views/dashboard/{$name}/partials/actions"),
-            'create.blade.php',
-            self::qualifyContent(
-                $stubPath.'/partials/actions/create.blade.stub',
-                $name
-            )
-        );
-        static::put(
-            resource_path("views/dashboard/{$name}/partials/actions"),
-            'delete.blade.php',
-            self::qualifyContent(
-                $stubPath.'/partials/actions/delete.blade.stub',
-                $name
-            )
-        );
-        static::put(
-            resource_path("views/dashboard/{$name}/partials/actions"),
-            'edit.blade.php',
-            self::qualifyContent(
-                $stubPath.'/partials/actions/edit.blade.stub',
-                $name
-            )
-        );
-        static::put(
-            resource_path("views/dashboard/{$name}/partials/actions"),
-            'forceDelete.blade.php',
-            self::qualifyContent(
-                $stubPath.'/partials/actions/forceDelete.blade.stub',
-                $name
-            )
-        );
-        static::put(
-            resource_path("views/dashboard/{$name}/partials/actions"),
-            'link.blade.php',
-            self::qualifyContent(
-                $stubPath.'/partials/actions/link.blade.stub',
-                $name
-            )
-        );
-        static::put(
-            resource_path("views/dashboard/{$name}/partials/actions"),
-            'restore.blade.php',
-            self::qualifyContent(
-                $stubPath.'/partials/actions/restore.blade.stub',
-                $name
-            )
-        );
-        static::put(
-            resource_path("views/dashboard/{$name}/partials/actions"),
-            'trashed.blade.php',
-            self::qualifyContent(
-                $stubPath.'/partials/actions/trashed.blade.stub',
-                $name
-            )
-        );
-        static::put(
-            resource_path("views/dashboard/{$name}/partials/actions"),
-            'show.blade.php',
-            self::qualifyContent(
-                $stubPath.'/partials/actions/show.blade.stub',
-                $name
-            )
-        );
-        static::put(
-            resource_path("views/dashboard/{$name}/partials/actions"),
-            'sidebar.blade.php',
-            self::qualifyContent(
-                $stubPath.'/partials/actions/sidebar.blade.stub',
-                $name
-            )
-        );
-        // Partials
-        static::put(
-            resource_path("views/dashboard/{$name}/partials"),
-            'filter.blade.php',
-            self::qualifyContent(
-                $stubPath.'/partials/filter.blade.stub',
-                $name
-            )
-        );
-        static::put(
-            resource_path("views/dashboard/{$name}/partials"),
-            'form.blade.php',
-            self::qualifyContent(
-                $stubPath.'/partials/form.blade.stub',
-                $name
-            )
-        );
-        // Resource
-        static::put(
-            resource_path("views/dashboard/{$name}"),
-            'create.blade.php',
-            self::qualifyContent(
-                $stubPath.'/create.blade.stub',
-                $name
-            )
-        );
-        static::put(
-            resource_path("views/dashboard/{$name}"),
-            'edit.blade.php',
-            self::qualifyContent(
-                $stubPath.'/edit.blade.stub',
-                $name
-            )
-        );
-        static::put(
-            resource_path("views/dashboard/{$name}"),
-            'index.blade.php',
-            self::qualifyContent(
-                $stubPath.'/index.blade.stub',
-                $name
-            )
-        );
-        static::put(
-            resource_path("views/dashboard/{$name}"),
-            'show.blade.php',
-            self::qualifyContent(
-                $stubPath.'/show.blade.stub',
-                $name
-            )
-        );
-        static::put(
-            resource_path("views/dashboard/{$name}"),
-            'trashed.blade.php',
-            self::qualifyContent(
-                $stubPath.'/trashed.blade.stub',
-                $name
-            )
-        );
+        $baseDir = base_path($base_path . "resources/views/dashboard/{$name}");
+
+        $path = "{$baseDir}/partials" ;
+
+        if (!is_dir($path)) {
+            mkdir($path, '0777', true);
+        }
+
+        $path = "{$baseDir}/partials/actions" ;
+
+        if (!is_dir($path)) {
+            mkdir($path, '0777', true);
+        }
+
+// Actions
+        $actions = [
+            'create', 'delete', 'edit', 'forceDelete',
+            'link', 'restore', 'trashed', 'show', 'sidebar'
+        ];
+
+        foreach ($actions as $file) {
+            static::put(
+                "{$baseDir}/partials/actions",
+                "{$file}.blade.php",
+                self::qualifyContent(
+                    "{$stubPath}/partials/actions/{$file}.blade.stub",
+                    $name,
+                    $module_name = Str::of($command->option('module'))->singular()->studly()
+                )
+            );
+        }
+
+// Partials
+        $partials = ['filter', 'form'];
+
+        foreach ($partials as $file) {
+            static::put(
+                "{$baseDir}/partials",
+                "{$file}.blade.php",
+                self::qualifyContent(
+                    "{$stubPath}/partials/{$file}.blade.stub",
+                    $name,
+                    $module_name = Str::of($command->option('module'))->singular()->studly()
+                )
+            );
+        }
+
+// Resource
+        $resources = ['create', 'edit', 'index', 'show', 'trashed'];
+
+        foreach ($resources as $file) {
+            static::put(
+                $baseDir,
+                "{$file}.blade.php",
+                self::qualifyContent(
+                    "{$stubPath}/{$file}.blade.stub",
+                    $name,
+                    $module_name = Str::of($command->option('module'))->singular()->studly()
+                )
+            );
+        }
     }
 }

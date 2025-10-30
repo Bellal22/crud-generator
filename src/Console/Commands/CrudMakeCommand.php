@@ -25,11 +25,11 @@ class CrudMakeCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'make:crud 
+    protected $signature = 'make:crud
                             {name : Class (Singular), e.g User, Place, Car}
-                            {--translatable}
-                            {--has-media}';
-
+                            {--translatable : Whether the model supports translations}
+                            {--has-media : Whether the model has media}
+                            {--module= : Optional module name (e.g. Source)}';
     /**
      * The console command description.
      *
@@ -54,33 +54,37 @@ class CrudMakeCommand extends Command
      */
     public function handle()
     {
-        Lang::generate($this);
-        Breadcrumb::generate($this);
-        View::generate($this);
-        Resource::generate($this);
-        Migration::generate($this);
-        Factory::generate($this);
-        Seeder::generate($this);
-        Policy::generate($this);
-        Controller::generate($this);
-        Model::generate($this);
-        Request::generate($this);
-        Filter::generate($this);
-        Test::generate($this);
+        $module =  $this->option('module');
+        $base_path = '';
+        if ($module)
+            $base_path = "Modules/${module}/";
+        Lang::generate($this,$base_path);
+        Breadcrumb::generate($this,$base_path);
+        View::generate($this,$base_path);
+        Resource::generate($this,$base_path);
+        Controller::generate($this,$base_path);
+        Model::generate($this,$base_path);
+        Request::generate($this,$base_path);
+        Filter::generate($this,$base_path);
+        Migration::generate($this,$base_path);
+        Policy::generate($this,$base_path);
+        Factory::generate($this,$base_path);
+        Seeder::generate($this,$base_path);
+        Test::generate($this,$base_path);
 
         $name = $this->argument('name');
 
-        app(Modifier::class)->routes($name);
+        app(Modifier::class)->routes($name,$base_path);
 
-        app(Modifier::class)->sidebar($name);
+        app(Modifier::class)->sidebar($name,$base_path);
+//
+        app(Modifier::class)->seeder($name,$base_path);
 
-        app(Modifier::class)->seeder($name);
+        app(Modifier::class)->permission($name,$base_path);
 
-        app(Modifier::class)->permission($name);
+        app(Modifier::class)->softDeletes($name,$base_path);
 
-        app(Modifier::class)->softDeletes($name);
-
-        app(Modifier::class)->langGenerator($name);
+        app(Modifier::class)->langGenerator($name,$base_path);
 
         $seederName = Str::of($name)->singular()->studly().'Seeder';
 

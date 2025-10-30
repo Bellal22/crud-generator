@@ -8,18 +8,19 @@ use AhmedAliraqi\CrudGenerator\Console\Commands\CrudMakeCommand;
 
 class Seeder extends CrudGenerator
 {
-    public static function generate(CrudMakeCommand $command)
+    public static function generate(CrudMakeCommand $command, string $base_path)
     {
         $name = Str::of($command->argument('name'))->singular()->studly();
 
         $stub = __DIR__.'/../stubs/Seeder.stub';
 
         static::put(
-            database_path('seeders'),
+            base_path($base_path."database/seeders"),
             $name.'Seeder.php',
             self::qualifyContent(
                 $stub,
-                $name
+                $name,
+                $module_name = Str::of($command->option('module'))->singular()->studly()
             )
         );
     }

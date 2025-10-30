@@ -8,9 +8,11 @@ use AhmedAliraqi\CrudGenerator\Console\Commands\CrudMakeCommand;
 
 class Lang extends CrudGenerator
 {
-    public static function generate(CrudMakeCommand $command)
+    public static function generate(CrudMakeCommand $command, string $base_path)
     {
         $name = Str::of($command->argument('name'))->plural()->snake();
+        $module_name = Str::of($command->option('module'))->singular()->studly();
+
 
         self::ensureArabicWasRegistered($name);
 
@@ -27,28 +29,45 @@ class Lang extends CrudGenerator
             $stub = __DIR__.'/../stubs/lang/lang.stub';
         }
 
+        $dir = base_path($base_path . 'lang/en');
+
+        // ensure directory exists
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+
         static::put(
-            base_path("lang/en"),
+            base_path($base_path."lang/en"),
             $name.'.php',
             self::qualifyContent(
                 $stub,
                 $name,
-                'en'
+                'en',
+                $module_name
             )
         );
 
+        $dir = base_path($base_path . 'lang/ar');
+
+        // ensure directory exists
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
         static::put(
-            base_path("lang/ar"),
+            base_path($base_path."lang/ar"),
             $name.'.php',
             self::qualifyContent(
                 $stub,
                 $name,
+                $module_name = Str::of($command->option('module'))->singular()->studly(),
                 'ar'
             )
         );
     }
 
-    protected static function qualifyContent($stub, $name, $lang = null)
+    protected static function qualifyContent($stub, $name, $module_name,$lang = null)
     {
         $replaceArray = static::englishResourceLang($name);
         if ($lang == 'ar') {
@@ -96,6 +115,7 @@ class Lang extends CrudGenerator
                 "{{dialogs.forceDelete.info}}",
                 "{{dialogs.forceDelete.confirm}}",
                 "{{dialogs.forceDelete.cancel}}",
+                "{{moduleName}}",
             ],
             $replaceArray,
             file_get_contents($stub)

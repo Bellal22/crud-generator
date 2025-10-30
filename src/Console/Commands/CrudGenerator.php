@@ -62,7 +62,7 @@ class CrudGenerator
         File::append($path_to_file, $append_route);
     }
 
-    protected static function qualifyContent($stub, $name)
+    protected static function qualifyContent($stub, $name,$module_name)
     {
         return str_replace(
             [
@@ -74,6 +74,7 @@ class CrudGenerator
                 '{{lowercaseDisplaySingular}}',
                 '{{uppercaseDisplayPlural}}',
                 '{{uppercaseDisplaySingular}}',
+                '{{moduleName}}',
             ],
             [
                 $studlySingular = Str::of($name)->singular()->studly(),
@@ -84,6 +85,7 @@ class CrudGenerator
                 $lowercaseDisplaySingular = Str::of($name)->snake()->replace('_', ' ')->singular()->lower(),
                 $uppercaseDisplayPlural = Str::of($name)->snake()->replace('_', ' ')->ucfirst()->plural()->lower(),
                 $uppercaseDisplaySingular = Str::of($name)->snake()->replace('_', ' ')->ucfirst()->singular()->lower(),
+                $moduleName = $module_name,
             ],
             file_get_contents($stub)
         );

@@ -7,21 +7,35 @@ use Spatie\Permission\Models\Permission;
 
 class Modifier
 {
-    public static function routes($name)
+    public static function routes($name,$base_path)
     {
-        $pattern = '\/\*  The routes of generated crud will set here: Don\'t remove this line  \*\/';
+        $pattern = '/\/\*\s*The routes of generated crud will set here: Don\'t remove this line\s*\*\//i';
 
-        $dashboard = file_get_contents(base_path('routes/dashboard.php'));
+        $dashboardPath = base_path($base_path . 'routes/dashboard.php');
+        $apiPath       = base_path($base_path . 'routes/api.php');
 
-        $api = file_get_contents(base_path('routes/api.php'));
+        // Ensure routes directory exists
+        $routesDir = base_path($base_path . 'routes');
+        if (!is_dir($routesDir)) {
+            mkdir($routesDir, 0755, true);
+        }
 
-        $controllerName = Str::of($name)->singular()->studly().'Controller';
+        // Load or initialize route files
+        $dashboard = file_exists($dashboardPath)
+            ? file_get_contents($dashboardPath)
+            : "<?php\n\n/*  The routes of generated crud will set here: Don't remove this line  */";
 
-        $resource = Str::of($name)->plural()->snake();
+        $api = file_exists($apiPath)
+            ? file_get_contents($apiPath)
+            : "<?php\n\n/*  The routes of generated crud will set here: Don't remove this line  */";
 
-        $singular = $resource->singular();
-        $studly = $resource->plural()->studly();
+        // Controller and resource names
+        $controllerName = Str::of($name)->singular()->studly() . 'Controller';
+        $resource       = Str::of($name)->plural()->snake();
+        $singular       = $resource->singular();
+        $studly         = $resource->plural()->studly();
 
+        // Dashboard routes
         $dashboardRoute = <<<DASHBOARD
 // $studly Routes.
 Route::get('trashed/$resource', '$controllerName@trashed')->name('$resource.trashed');
@@ -33,6 +47,7 @@ Route::resource('$resource', '$controllerName');
 /*  The routes of generated crud will set here: Don't remove this line  */
 DASHBOARD;
 
+        // API routes
         $apiRoutes = <<<API
 // $studly Routes.
 Route::apiResource('$resource', '$controllerName');
@@ -40,94 +55,152 @@ Route::get('/select/$resource', '$controllerName@select')->name('$resource.selec
 
 /*  The routes of generated crud will set here: Don't remove this line  */
 API;
-        $dashboard = preg_replace("/$pattern/", $dashboardRoute, $dashboard);
 
-        $api = preg_replace("/$pattern/", $apiRoutes, $api);
+        // Replace or append in dashboard.php
+        if (preg_match($pattern, $dashboard)) {
+            $dashboard = preg_replace($pattern, $dashboardRoute, $dashboard);
+        } else {
+            $dashboard .= "\n\n" . $dashboardRoute;
+        }
 
-        file_put_contents(base_path('routes/dashboard.php'), $dashboard);
+        // Replace or append in api.php
+        if (preg_match($pattern, $api)) {
+            $api = preg_replace($pattern, $apiRoutes, $api);
+        } else {
+            $api .= "\n\n" . $apiRoutes;
+        }
 
-        file_put_contents(base_path('routes/api.php'), $api);
+        // Save back to files
+        file_put_contents($dashboardPath, $dashboard);
+        file_put_contents($apiPath, $api);
     }
 
-    public function sidebar($name)
+    public function sidebar($name,$base_path)
     {
-        $pattern = '\{\{-- The sidebar of generated crud will set here: Don\'t remove this line --\}\}';
+        // TODO: CRUD 2
+        $pattern = '/\{\{\-\-\s*The sidebar of generated crud will set here: Don\'t remove this line\s*\-\-\}\}/i';
+
+        $sidebarPath = base_path($base_path . 'views/layouts/sidebar.blade.php');
+        $layoutsDir  = dirname($sidebarPath);
+
+        // Ensure layouts directory exists
+        if (!is_dir($layoutsDir)) {
+            mkdir($layoutsDir, 0755, true);
+        }
+
+        // Load or initialize sidebar file
+        $sidebarFile = file_exists($sidebarPath)
+            ? file_get_contents($sidebarPath)
+            : "@extends('layouts.master')\n\n{{-- The sidebar of generated crud will set here: Don't remove this line --}}";
 
         $resource = Str::of($name)->plural()->snake();
-
-        $sidebarFile = file_get_contents(resource_path('views/layouts/sidebar.blade.php'));
 
         $sidebar = <<<SIDEBAR
 @include('dashboard.$resource.partials.actions.sidebar')
 {{-- The sidebar of generated crud will set here: Don't remove this line --}}
 SIDEBAR;
 
-        $sidebarFile = preg_replace("/$pattern/", $sidebar, $sidebarFile);
+        // Replace or append depending on pattern existence
+        if (preg_match($pattern, $sidebarFile)) {
+            $sidebarFile = preg_replace($pattern, $sidebar, $sidebarFile);
+        } else {
+            $sidebarFile .= "\n\n" . $sidebar;
+        }
 
-        file_put_contents(resource_path('views/layouts/sidebar.blade.php'), $sidebarFile);
+        // Save updated content
+        file_put_contents($sidebarPath, $sidebarFile);
     }
 
-    public function permission($name)
+    public function permission($name, $base_path)
     {
         $resource = Str::of($name)->plural()->snake();
 
         // Reset cached roles and permissions
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+//        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+//
+//        // Create or update permission
+//        Permission::updateOrCreate(['name' => "manage.$resource"]);
 
-        // create permissions
-        Permission::updateOrCreate(['name' => "manage.$resource"]);
+        $file = base_path($base_path . 'storage/permissions.json');
+        $dir = dirname($file);
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
 
-        $permissions = @json_decode(file_get_contents(storage_path('permissions.json'))) ?? [];
+        $permissions = @json_decode(file_get_contents($file), true) ?? [];
 
-        $permissions[] = "manage.$resource";
+        // Avoid duplicates
+        if (!in_array("manage.$resource", $permissions)) {
+            $permissions[] = "manage.$resource";
+        }
 
-        file_put_contents(storage_path('permissions.json'), json_encode($permissions, JSON_PRETTY_PRINT));
+        file_put_contents($file, json_encode($permissions, JSON_PRETTY_PRINT));
     }
 
-    public function softDeletes($name)
+    public function softDeletes($name, $base_path)
     {
         $resource = Str::of($name)->singular()->snake();
 
-        $map = @json_decode(file_get_contents(storage_path('soft_deletes_route_binding.json')), true) ?? [];
+        $file = base_path($base_path . 'storage/soft_deletes_route_binding.json');
+        $dir = dirname($file);
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
 
-        $map["trashed_$resource"] = "App\\Models\\".Str::of($name)->singular()->studly();
+        $map = @json_decode(file_get_contents($file), true) ?? [];
 
-        file_put_contents(storage_path('soft_deletes_route_binding.json'), json_encode($map, JSON_PRETTY_PRINT));
+        $key = "trashed_$resource";
+        $value = "App\\Models\\" . Str::of($name)->singular()->studly();
+
+        // Update or add key
+        $map[$key] = $value;
+
+        file_put_contents($file, json_encode($map, JSON_PRETTY_PRINT));
     }
 
-    public function seeder($name)
+    public function seeder($name, $base_path)
     {
         $resource = Str::of($name)->singular()->studly();
 
-        $pattern = '\/\*  The seeders of generated crud will set here: Don\'t remove this line  \*\/';
+        $path = base_path($base_path . 'database/seeders/DummyDataSeeder.php');
+        $dir = dirname($path);
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
 
-        $seederFile = file_get_contents(database_path('seeders/DummyDataSeeder.php'));
+        // Create the file if not exists
+        if (!file_exists($path)) {
+            file_put_contents($path, "<?php\n\nclass DummyDataSeeder extends Seeder\n{\n    public function run()\n    {\n        /*  The seeders of generated crud will set here: Don't remove this line  */\n    }\n}");
+        }
 
-        $seeder = <<<SEEDER
-\$this->call({$resource}Seeder::class);
-        /*  The seeders of generated crud will set here: Don't remove this line  */
-SEEDER;
+        $content = file_get_contents($path);
+        $pattern = '/\/\*\s*The seeders of generated crud will set here: Don\'t remove this line\s*\*\//';
 
-        $seederFile = preg_replace("/$pattern/", $seeder, $seederFile);
+        $newLine = "\$this->call({$resource}Seeder::class);\n        /*  The seeders of generated crud will set here: Don't remove this line  */";
 
-        file_put_contents(database_path('seeders/DummyDataSeeder.php'), $seederFile);
+        // Avoid duplicate seeder calls
+        if (!str_contains($content, "\$this->call({$resource}Seeder::class);")) {
+            $content = preg_replace($pattern, $newLine, $content);
+            file_put_contents($path, $content);
+        }
     }
 
-    public function langGenerator($name)
+    public function langGenerator($name, $base_path)
     {
         $resource = Str::of($name)->plural()->snake();
 
-        $pattern = '\/\*  The lang of generated crud will set here: Don\'t remove this line  \*\/';
+        $path = base_path($base_path . 'config/lang-generator.php');
+        $dir = dirname($path);
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
 
-        $configFile = file_get_contents(config_path('lang-generator.php'));
+        // Create the file if not exists
+        if (!file_exists($path)) {
+            file_put_contents($path, "<?php\n\nreturn [\n    /*  The lang of generated crud will set here: Don't remove this line  */\n];");
+        }
 
-        $lang = <<<LANG
-'$resource' => base_path('lang/{lang}/$resource.php'),
-        /*  The lang of generated crud will set here: Don't remove this line  */
-LANG;
+        $content = file_get_contents($path);
+        $pattern = '/\/\*\s*The lang of generated crud will set here: Don\'t remove this line\s*\*\//';
 
-        $configFile = preg_replace("/$pattern/", $lang, $configFile);
+        $newLang = "'$resource' => base_path('lang/{lang}/$resource.php'),\n    /*  The lang of generated crud will set here: Don't remove this line  */";
 
-        file_put_contents(config_path('lang-generator.php'), $configFile);
+        // Avoid duplicate lines
+        if (!str_contains($content, "'$resource' => base_path('lang/{lang}/$resource.php')")) {
+            $content = preg_replace($pattern, $newLang, $content);
+            file_put_contents($path, $content);
+        }
     }
 }

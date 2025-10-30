@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard;
+namespace Modules\{{moduleName}}\App\Http\Controllers\Dashboard;
 
 use App\Models\{{studlySingular}};
 use Illuminate\Routing\Controller;
