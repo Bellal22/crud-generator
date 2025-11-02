@@ -1,10 +1,10 @@
 <?php
 
-namespace AhmedAliraqi\CrudGenerator;
+namespace Bellal22\CrudGenerator;
 
-use AhmedAliraqi\CrudGenerator\Console\Commands\AccountCloneCommand;
+use Bellal22\CrudGenerator\Console\Commands\AccountCloneCommand;
 use Illuminate\Support\ServiceProvider;
-use AhmedAliraqi\CrudGenerator\Console\Commands\CrudMakeCommand;
+use Bellal22\CrudGenerator\Console\Commands\CrudMakeCommand;
 
 class CrudServiceProvider extends ServiceProvider
 {

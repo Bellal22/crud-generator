@@ -1,22 +1,22 @@
 <?php
 
-namespace AhmedAliraqi\CrudGenerator\Console\Commands;
+namespace Bellal22\CrudGenerator\Console\Commands;
 
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
-use AhmedAliraqi\CrudGenerator\Console\Commands\Generators\Lang;
-use AhmedAliraqi\CrudGenerator\Console\Commands\Generators\Test;
-use AhmedAliraqi\CrudGenerator\Console\Commands\Generators\View;
-use AhmedAliraqi\CrudGenerator\Console\Commands\Generators\Model;
-use AhmedAliraqi\CrudGenerator\Console\Commands\Generators\Filter;
-use AhmedAliraqi\CrudGenerator\Console\Commands\Generators\Policy;
-use AhmedAliraqi\CrudGenerator\Console\Commands\Generators\Seeder;
-use AhmedAliraqi\CrudGenerator\Console\Commands\Generators\Factory;
-use AhmedAliraqi\CrudGenerator\Console\Commands\Generators\Request;
-use AhmedAliraqi\CrudGenerator\Console\Commands\Generators\Resource;
-use AhmedAliraqi\CrudGenerator\Console\Commands\Generators\Migration;
-use AhmedAliraqi\CrudGenerator\Console\Commands\Generators\Breadcrumb;
-use AhmedAliraqi\CrudGenerator\Console\Commands\Generators\Controller;
+use Bellal22\CrudGenerator\Console\Commands\Generators\Lang;
+use Bellal22\CrudGenerator\Console\Commands\Generators\Test;
+use Bellal22\CrudGenerator\Console\Commands\Generators\View;
+use Bellal22\CrudGenerator\Console\Commands\Generators\Model;
+use Bellal22\CrudGenerator\Console\Commands\Generators\Filter;
+use Bellal22\CrudGenerator\Console\Commands\Generators\Policy;
+use Bellal22\CrudGenerator\Console\Commands\Generators\Seeder;
+use Bellal22\CrudGenerator\Console\Commands\Generators\Factory;
+use Bellal22\CrudGenerator\Console\Commands\Generators\Request;
+use Bellal22\CrudGenerator\Console\Commands\Generators\Resource;
+use Bellal22\CrudGenerator\Console\Commands\Generators\Migration;
+use Bellal22\CrudGenerator\Console\Commands\Generators\Breadcrumb;
+use Bellal22\CrudGenerator\Console\Commands\Generators\Controller;
 
 class CrudMakeCommand extends Command
 {
@@ -35,7 +35,7 @@ class CrudMakeCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Create all Crud operations with a single command';
+    protected $description = 'Create CRUD files for a module';
 
     /**
      * Create a new command instance.

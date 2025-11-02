@@ -1,10 +1,10 @@
 <?php
 
-namespace AhmedAliraqi\CrudGenerator\Console\Commands\Generators;
+namespace Bellal22\CrudGenerator\Console\Commands\Generators;
 
 use Illuminate\Support\Str;
-use AhmedAliraqi\CrudGenerator\Console\Commands\CrudGenerator;
-use AhmedAliraqi\CrudGenerator\Console\Commands\CrudMakeCommand;
+use Bellal22\CrudGenerator\Console\Commands\CrudGenerator;
+use Bellal22\CrudGenerator\Console\Commands\CrudMakeCommand;
 
 class Resource extends CrudGenerator
 {

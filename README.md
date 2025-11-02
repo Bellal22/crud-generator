@@ -24,7 +24,7 @@ composer require ahmed-aliraqi/crud-generator --dev
 ### Configuration
 You should add config file using the following command to configure the supported resources.
 ```shell
-php artisan vendor:publish --provider="AhmedAliraqi\CrudGenerator\CrudServiceProvider"
+php artisan vendor:publish --provider="Bellal22\CrudGenerator\CrudServiceProvider"
 ```
 
 Then add the following comment line in the `routes/dashboard.php` and `routes/api.php` files:

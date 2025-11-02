@@ -1,6 +1,6 @@
 {
   "name": "bellal22/crud-generator",
-  "description": "This package is a useful tool to generate simple crud for laravel-modules/scaffolding",
+  "description": "Custom version of Ahmed Aliraqi CRUD Generator with module support",
   "type": "library",
   "license": "MIT",
   "authors": [
@@ -16,13 +16,13 @@
   },
   "autoload": {
     "psr-4": {
-      "Bellal\\CrudGenerator\\": "src/"
+      "Bellal22\\CrudGenerator\\": "src/"
     }
   },
   "extra": {
     "laravel": {
       "providers": [
-        "AhmedAliraqi\\CrudGenerator\\CrudServiceProvider"
+        "Bellal22\\CrudGenerator\\CrudServiceProvider"
       ]
     }
   }

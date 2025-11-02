@@ -1,6 +1,6 @@
 <?php
 
-namespace AhmedAliraqi\CrudGenerator\Console\Commands;
+namespace Bellal22\CrudGenerator\Console\Commands;
 
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
